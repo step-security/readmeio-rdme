@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 
+import * as core from '@actions/core';
+import axios from 'axios';
 import stringArgv from 'string-argv';
-import axios from 'axios'
-import * as core from '@actions/core'
 
 async function validateSubscription() {
-  const API_URL = `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/subscription`
+  const API_URL = `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/subscription`;
 
   try {
-    await axios.get(API_URL, {timeout: 3000})
+    await axios.get(API_URL, { timeout: 3000 });
   } catch (error) {
     if (error instanceof axios.AxiosError && error.response && error.response.status === 403) {
-      core.error(
-        'Subscription is not valid. Reach out to support@stepsecurity.io'
-      )
-      process.exit(1)
+      core.error('Subscription is not valid. Reach out to support@stepsecurity.io');
+      process.exit(1);
     } else {
-      core.info('Timeout or API not reachable. Continuing to next step.')
+      core.info('Timeout or API not reachable. Continuing to next step.');
     }
   }
 }
