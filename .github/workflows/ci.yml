@@ -131,25 +131,3 @@ jobs:
         if: ${{ github.ref }} == 'refs/heads/next'
         with:
           rdme: openapi validate oas-examples-repo/3.1/json/petstore.json
-
-      # Docs: https://rdme-refactored-test.readme.io
-      - name: Run `openapi upload` command
-        uses: ./rdme-repo/
-        with:
-          rdme: openapi upload oas-examples-repo/3.1/json/petstore.json --key=${{ secrets.RDME_REFACTORED_TEST_PROJECT_API_KEY }}
-      - name: Run `openapi upload` command with env var
-        uses: ./rdme-repo/
-        with:
-          rdme: openapi upload oas-examples-repo/3.1/json/petstore.json
-        env:
-          RDME_API_KEY: ${{ secrets.RDME_REFACTORED_TEST_PROJECT_API_KEY }}
-      - name: Run `openapi upload` command with other env var
-        uses: ./rdme-repo/
-        with:
-          rdme: openapi upload oas-examples-repo/3.1/json/petstore.json
-        env:
-          README_API_KEY: ${{ secrets.RDME_REFACTORED_TEST_PROJECT_API_KEY }}
-      - name: Run `openapi upload` command with weird arg syntax
-        uses: ./rdme-repo/
-        with:
-          rdme: openapi upload "oas-examples-repo/3.1/json/petstore.json" --key "${{ secrets.RDME_REFACTORED_TEST_PROJECT_API_KEY }}"
