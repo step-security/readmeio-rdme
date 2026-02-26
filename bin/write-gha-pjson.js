@@ -4,35 +4,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import axios from 'axios'
-import * as core from '@actions/core'
 
 const newTarget = './commands.js';
-
-
-async function validateSubscription() {
-  const API_URL = `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/subscription`
-
-  try {
-    await axios.get(API_URL, {timeout: 3000})
-  } catch (error) {
-    if (error instanceof axios.AxiosError && error.response && error.response.status === 403) {
-      core.error(
-        'Subscription is not valid. Reach out to support@stepsecurity.io'
-      )
-      process.exit(1)
-    } else {
-      core.info('Timeout or API not reachable. Continuing to next step.')
-    }
-  }
-}
 
 /**
  * We need to duplicate the `package.json` file (with a few modifications) from the root of the project to the
  * `dist-gha` directory, so that the GitHub Actions-flavored `oclif` configuration can find it.
  */
-async function writeGitHubActionsPackageJson() {
-  await validateSubscription();
+function writeGitHubActionsPackageJson() {
   const current = JSON.parse(
     fs.readFileSync(path.resolve(import.meta.dirname, '../package.json'), { encoding: 'utf-8' }),
   );
@@ -58,4 +37,4 @@ async function writeGitHubActionsPackageJson() {
   fs.writeFileSync(path.resolve(import.meta.dirname, '../dist-gha/package.json'), JSON.stringify(current, null, 2));
 }
 
-await writeGitHubActionsPackageJson();
+writeGitHubActionsPackageJson();
