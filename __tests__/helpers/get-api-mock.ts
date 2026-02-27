@@ -24,7 +24,7 @@ export function getAPIv1Mock(reqHeaders = {}) {
 export function getAPIv2Mock(reqHeaders: nock.Options['reqheaders'] = {}) {
   return nock(config.host.v2, {
     reqheaders: {
-      'User-Agent': ua => ua.startsWith(`rdme/${mockVersion}`),
+      'User-Agent': ua => ua.startsWith(`readmeio-rdme/${mockVersion}`),
       'x-readme-source': 'cli',
       ...reqHeaders,
     },
@@ -36,7 +36,7 @@ export function getAPIv2Mock(reqHeaders: nock.Options['reqheaders'] = {}) {
  */
 export function getAPIv2MockForGHA(reqHeaders: nock.Options['reqheaders'] = {}) {
   return getAPIv2Mock({
-    'User-Agent': ua => ua.startsWith(`rdme-github/${mockVersion}`),
+    'User-Agent': ua => ua.startsWith(`readmeio-rdme-github/${mockVersion}`),
     'x-readme-source': 'cli-gh',
     ...reqHeaders,
   });
