@@ -22,10 +22,15 @@ jobs:
           - latest
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -37,7 +42,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install deps
         run: npm ci
@@ -52,13 +62,18 @@ jobs:
     name: GitHub Action Dry Run
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        with:
+          egress-policy: audit
+
       - name: Checkout GitHub Action
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           path: rdme-repo
 
       - name: Checkout external repo containing OpenAPI file
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           path: oas-examples-repo
           repository: readmeio/oas-examples
@@ -127,7 +142,7 @@ jobs:
       # this is a test to ensure that the rdme github action can run properly
       # the way that our users invoke it
       - name: E2E run of `openapi validate` on `next` branch
-        uses: step-security/readmeio-rdme@release
+        uses: step-security/readmeio-rdme@b716974e7a94c05c8593e3453737ea58a11fe1da # release
         if: ${{ github.ref }} == 'refs/heads/next'
         with:
           rdme: openapi validate oas-examples-repo/3.1/json/petstore.json
