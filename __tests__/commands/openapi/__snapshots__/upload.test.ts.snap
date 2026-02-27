@@ -334,8 +334,8 @@ exports[`rdme openapi upload > given that the API definition is a local file > a
   "stderr": "- Validating the API definition located at __tests__/__fixtures__/petstore-simple-weird-version.json...
  ›   Warning: The slug you provided looks like a legacy API definition ID, and 
  ›   these IDs are now deprecated in ReadMe. More info here: 
- ›   https://github.com/step-security/rdme/blob/v10/documentation/migration-gui
- ›   de.md#v10-openapi-upload-command-updates
+ ›   https://github.com/step-security/readmeio-rdme/blob/v10/documentation/migr
+ ›   ation-guide.md#v10-openapi-upload-command-updates
 - Creating your API definition to ReadMe...
 ✔ Creating your API definition to ReadMe... done!
 ",

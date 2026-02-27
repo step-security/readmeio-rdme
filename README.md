@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/step-security/rdme"><img src="https://img.shields.io/github/actions/workflow/status/step-security/rdme/ci.yml?branch=main&style=for-the-badge" alt="Build status"></a>
+  <a href="https://github.com/step-security/readmeio-rdme"><img src="https://img.shields.io/github/actions/workflow/status/step-security/readmeio-rdme/ci.yml?branch=main&style=for-the-badge" alt="Build status"></a>
 </p>
 
 <p align="center">
@@ -39,7 +39,7 @@ npm run build && npm run build:docs
 - uses: actions/checkout@v6
 
 ## Runs the `rdme openapi validate petstore.json` command with the root directory being your repo
-- uses: step-security/rdme@v10
+- uses: step-security/readmeio-rdme@v10
   with:
     rdme: openapi validate petstore.json
 ```

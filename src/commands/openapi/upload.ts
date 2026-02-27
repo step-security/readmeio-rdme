@@ -231,7 +231,7 @@ export default class OpenAPIUploadCommand extends BaseCommand<typeof OpenAPIUplo
           filename = matchedLegacyAPIDefinition.filename;
         } else {
           this.warn(
-            'The slug you provided looks like a legacy API definition ID, and these IDs are now deprecated in ReadMe. More info here: https://github.com/step-security/rdme/blob/v10/documentation/migration-guide.md#v10-openapi-upload-command-updates',
+            'The slug you provided looks like a legacy API definition ID, and these IDs are now deprecated in ReadMe. More info here: https://github.com/step-security/readmeio-rdme/blob/v10/documentation/migration-guide.md#v10-openapi-upload-command-updates',
           );
         }
       }

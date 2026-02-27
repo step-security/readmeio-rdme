@@ -176,7 +176,7 @@ export async function readmeAPIv1Fetch(
       /**
        * Constructs a full URL to the file using GitHub Actions runner variables
        * @see {@link https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables}
-       * @example https://github.com/step-security/rdme/blob/v10/documentation/rdme.md
+       * @example https://github.com/step-security/readmeio-rdme/blob/v10/documentation/rdme.md
        */
       try {
         const sourceUrl = new URL(
@@ -275,7 +275,7 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
       /**
        * Constructs a full URL to the file using GitHub Actions runner variables
        * @see {@link https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables}
-       * @example https://github.com/step-security/rdme/blob/v10/documentation/rdme.md
+       * @example https://github.com/step-security/readmeio-rdme/blob/v10/documentation/rdme.md
        */
       try {
         const sourceUrl = new URL(

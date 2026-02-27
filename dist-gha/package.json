@@ -40,10 +40,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/step-security/rdme.git"
+    "url": "git+https://github.com/step-security/readmeio-rdme.git"
   },
   "bugs": {
-    "url": "https://github.com/step-security/rdme/issues"
+    "url": "https://github.com/step-security/readmeio-rdme/issues"
   },
   "type": "module",
   "dependencies": {

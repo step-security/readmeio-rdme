@@ -28,7 +28,7 @@ jobs:
       - name: GitHub Action
         # We recommend specifying a fixed version, i.e. @RDME_VERSION
         # Docs: https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions
-        uses: step-security/rdme@RDME_VERSION
+        uses: step-security/readmeio-rdme@RDME_VERSION
         with:
           rdme: docs upload ./documentation --key=${{ secrets.README_API_KEY }} --branch=2.0
 ```

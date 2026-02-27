@@ -6,7 +6,7 @@ Is your OpenAPI definition stored on GitHub? With [the `rdme` GitHub Action](htt
 
 ## Constructing a GitHub Actions Workflow
 
-In order to construct the workflow file, you'll first want to determine a unique API definition slug from ReadMe so we know which definition you want to update on subsequent re-syncs. The slug value is technically optional and can be inferred from the file name — you can learn more about how we handle this [in the command documentation](https://github.com/step-security/rdme/blob/v10/documentation/commands/openapi.md#rdme-openapi-upload-spec).
+In order to construct the workflow file, you'll first want to determine a unique API definition slug from ReadMe so we know which definition you want to update on subsequent re-syncs. The slug value is technically optional and can be inferred from the file name — you can learn more about how we handle this [in the command documentation](https://github.com/step-security/readmeio-rdme/blob/v10/documentation/commands/openapi.md#rdme-openapi-upload-spec).
 
 If you've already uploaded an existing file (either via uploading a file directly to your API Reference section in ReadMe or via `rdme`) and you'd like to update it, see below to determine what the slug of that API definition is.
 
@@ -57,7 +57,7 @@ jobs:
       - name: GitHub Action
         # We recommend specifying a fixed version, i.e. @RDME_VERSION
         # Docs: https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions#example-using-versioned-actions
-        uses: step-security/rdme@RDME_VERSION
+        uses: step-security/readmeio-rdme@RDME_VERSION
         with:
           rdme: openapi upload ./path-to-file.json --key=${{ secrets.README_API_KEY }} --slug=API_DEFINITION_SLUG
 ```

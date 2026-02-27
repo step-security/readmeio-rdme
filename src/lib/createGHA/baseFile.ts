@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run \`{{command}}\` command 🚀
-        uses: step-security/rdme@{{rdmeVersion}}
+        uses: step-security/readmeio-rdme@{{rdmeVersion}}
         with:
           rdme: {{commandString}}
 `;

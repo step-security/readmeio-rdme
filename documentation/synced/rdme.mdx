@@ -23,9 +23,9 @@ content:
   <a href="https://npm.im/rdme">
     <img src="https://img.shields.io/npm/l/rdme?style=for-the-badge" alt="MIT License" />
   </a>
-  <a href="https://github.com/step-security/rdme">
+  <a href="https://github.com/step-security/readmeio-rdme">
     <img
-      src="https://img.shields.io/github/actions/workflow/status/step-security/rdme/ci.yml?branch=main&style=for-the-badge"
+      src="https://img.shields.io/github/actions/workflow/status/step-security/readmeio-rdme/ci.yml?branch=main&style=for-the-badge"
       alt="Build status"
     />
   </a>
@@ -195,7 +195,7 @@ Follow these steps to manually configure a GitHub Actions Workflow. This will re
 - uses: actions/checkout@v4
 
 # Runs the `rdme` command on your repo's contents
-- uses: step-security/rdme@RDME_VERSION
+- uses: step-security/readmeio-rdme@RDME_VERSION
   with:
     rdme: [your command here]
 ```
@@ -209,7 +209,7 @@ rdme openapi upload [url-or-local-path-to-file] --key=$README_API_KEY
 To execute this command via GitHub Actions, the step would look like this:
 
 ```yml
-- uses: step-security/rdme@RDME_VERSION
+- uses: step-security/readmeio-rdme@RDME_VERSION
   with:
     rdme: openapi upload [url-or-local-path-to-file] --key=${{ secrets.README_API_KEY }}
 ```
@@ -222,9 +222,9 @@ The following section has links to full GitHub Actions workflow file examples.
 >
 > Here are the relevant files on GitHub:
 >
-> - [The Markdown source file for the page you're reading](https://github.com/step-security/rdme/blob/main/documentation/synced/rdme.md)
-> - [The GitHub Actions workflow file that syncs the Markdown to docs.readme.com](https://github.com/step-security/rdme/blob/main/.github/workflows/docs.yml)
-> - And finally... [the workflow run results](https://github.com/step-security/rdme/actions/workflows/docs.yml)
+> - [The Markdown source file for the page you're reading](https://github.com/step-security/readmeio-rdme/blob/main/documentation/synced/rdme.md)
+> - [The GitHub Actions workflow file that syncs the Markdown to docs.readme.com](https://github.com/step-security/readmeio-rdme/blob/main/.github/workflows/docs.yml)
+> - And finally... [the workflow run results](https://github.com/step-security/readmeio-rdme/actions/workflows/docs.yml)
 
 ### GitHub Actions Examples
 
@@ -242,7 +242,7 @@ Want to start syncing? We have several example workflow files available:
 To use sensitive information (like your ReadMe API key) in your `rdme` GitHub Action, first [create a new repository secret](https://docs.github.com/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository). Let's say you create a new secret key called `README_API_KEY`. The usage in the `rdme` step will look something like this:
 
 ```yml
-- uses: step-security/rdme@RDME_VERSION
+- uses: step-security/readmeio-rdme@RDME_VERSION
   with:
     rdme: openapi upload [url-or-local-path-to-file] --key=${{ secrets.README_API_KEY }}
 ```
@@ -300,7 +300,7 @@ script: npx rdme@RDME_VERSION openapi upload [url-or-local-path-to-file] --key=$
 ```
 {/* prettier-ignore-end */}
 
-If you notice any issues with any of these examples, please open up an issue on [the `rdme` repository on GitHub](https://github.com/step-security/rdme).
+If you notice any issues with any of these examples, please open up an issue on [the `rdme` repository on GitHub](https://github.com/step-security/readmeio-rdme).
 
 > 🚧 Secretly store your ReadMe API Key!
 >

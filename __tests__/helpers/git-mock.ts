@@ -18,7 +18,7 @@ export function getGitRemoteMock(
   /** remote to return (usually `origin`) */
   remote = 'origin',
   /** git URL for the given remote */
-  remoteUrl = 'https://github.com/step-security/rdme.git',
+  remoteUrl = 'https://github.com/step-security/readmeio-rdme.git',
   /** the HEAD branch */
   defaultBranch = 'main',
 ) {

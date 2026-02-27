@@ -59,7 +59,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run \`openapi validate\` command 🚀
-        uses: step-security/rdme@v10
+        uses: step-security/readmeio-rdme@v10
         with:
           rdme: openapi validate __tests__/__fixtures__/petstore-simple-weird-version.json
 "
@@ -109,7 +109,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run \`openapi validate\` command 🚀
-        uses: step-security/rdme@v10
+        uses: step-security/readmeio-rdme@v10
         with:
           rdme: openapi validate petstore.json --working-directory=./__tests__/__fixtures__/relative-ref-oas
 "
@@ -159,7 +159,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run \`openapi validate\` command 🚀
-        uses: step-security/rdme@v10
+        uses: step-security/readmeio-rdme@v10
         with:
           rdme: openapi validate __tests__/__fixtures__/petstore-simple-weird-version.json
 "
@@ -210,7 +210,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run \`openapi validate\` command 🚀
-        uses: step-security/rdme@v10
+        uses: step-security/readmeio-rdme@v10
         with:
           rdme: openapi validate __tests__/__fixtures__/petstore-simple-weird-version.json
 "
