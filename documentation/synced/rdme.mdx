@@ -39,24 +39,6 @@ content:
 
 Thanks to ReadMe's support [for bi-directional syncing](https://docs.readme.com/main/docs/bi-directional-sync), technical and nontechnical content writers alike can collaborate on docs using a workflow of their choice. But if you're anything like us, your documentation process may be a part of a broader CI/CD process that necessitates a more complex workflow. For example, you may want to automatically update your Guides or API reference on ReadMe every time you ship new code.
 
-That's where `rdme` — ReadMe's official command-line interface (CLI) and GitHub Action — comes in! With `rdme`, you can create workflows for a variety of use cases, including:
-
-- Syncing [OpenAPI/Swagger](https://docs.readme.com/main/docs/openapi) definitions (with support for bundling external references) 📦
-- Pre-upload validation (including OpenAPI 3.1) ✅
-- Syncing directories of Markdown files 📖
-
-## General Setup and Usage
-
-To see detailed CLI setup instructions and all available commands, check out [the `rdme` GitHub repository](https://github.com/step-security/rdme#readme).
-
-### Markdown File Setup
-
-> 🚧 ReadMe Refactored Guidance
->
-> This guidance is only applicable for projects that have been migrated to [ReadMe Refactored](https://docs.readme.com/main/docs/migration). The Refactored project architecture requires `rdme@10`, while the legacy project architecture requires `rdme@9`.
->
-> For more information, check out our [migration guide](https://github.com/step-security/rdme/blob/v10/documentation/migration-guide.md)
-
 With `rdme`, you can sync Markdown files to any of the following sections:
 
 - Guides (using the `docs upload` command)
@@ -245,12 +227,6 @@ The following section has links to full GitHub Actions workflow file examples.
 > - And finally... [the workflow run results](https://github.com/step-security/rdme/actions/workflows/docs.yml)
 
 ### GitHub Actions Examples
-
-> 🚧 ReadMe Refactored Guidance
->
-> This guidance is only applicable for projects that have been migrated to [ReadMe Refactored](https://docs.readme.com/main/docs/migration). The Refactored project architecture requires `rdme@10`, while the legacy project architecture requires `rdme@9`.
->
-> For more information, check out our [migration guide](https://github.com/step-security/rdme/blob/v10/documentation/migration-guide.md)
 
 Want to start syncing? We have several example workflow files available:
 

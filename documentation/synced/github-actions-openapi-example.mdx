@@ -2,12 +2,6 @@
 title: 'GitHub Actions Example: Syncing OpenAPI'
 ---
 
-> 🚧 ReadMe Refactored Guidance
->
-> This guidance is only applicable for projects that have been migrated to [ReadMe Refactored](https://docs.readme.com/main/docs/migration). The Refactored project architecture requires `rdme@10`, while the legacy project architecture requires `rdme@9`.
->
-> For more information, check out our [migration guide](https://github.com/step-security/rdme/blob/v10/documentation/migration-guide.md)
-
 Is your OpenAPI definition stored on GitHub? With [the `rdme` GitHub Action](https://docs.readme.com/main/docs/rdme), you can sync it to ReadMe every time it's updated in GitHub. Let's go over how to set this up!
 
 ## Constructing a GitHub Actions Workflow
@@ -57,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout this repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Run GitHub Action to sync OpenAPI file at ./path-to-file.json
       - name: GitHub Action
