@@ -80,7 +80,7 @@
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.13",
+    "@biomejs/biome": "^2.4.5",
     "@oclif/test": "^4.1.16",
     "@readme/better-ajv-errors": "^2.3.2",
     "@readme/oas-examples": "^7.2.1",
