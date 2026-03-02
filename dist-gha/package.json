@@ -83,7 +83,7 @@
     "@biomejs/biome": "^2.3.13",
     "@oclif/test": "^4.1.16",
     "@readme/better-ajv-errors": "^2.3.2",
-    "@readme/oas-examples": "^7.2.1",
+    "@readme/oas-examples": "^8.0.0",
     "@readme/standards": "^2.1.1",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.0.0",
