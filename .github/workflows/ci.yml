@@ -17,7 +17,7 @@ jobs:
           # see the following:
           # https://github.com/actions/setup-node?tab=readme-ov-file#supported-version-syntax
           # https://github.com/nvm-sh/nvm/issues/1998#issuecomment-594958684
-          - 20
+          - 24
           - lts/*
           - latest
 

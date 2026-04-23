@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "step-security",
   "engines": {
-    "node": ">=20.10.0"
+    "node": ">=24"
   },
   "bin": {
     "rdme": "bin/run.js"
