@@ -18,7 +18,7 @@ on:
       node_version:
         description: "Specify Node.js version (e.g., '18', '20', 'lts/*')"
         required: false
-        default: "24"
+        default: '24'
 
   pull_request:
     types: [opened, synchronize, labeled]

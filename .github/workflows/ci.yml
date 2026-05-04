@@ -94,6 +94,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: rdme-repo/package-lock.json
 
       - name: Rebuild GitHub Action for testing purposes
         # We manually invoke `bin/write-gha-pjson.js` here because
