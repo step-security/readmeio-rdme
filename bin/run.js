@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+import fs from 'fs';
+
 import * as core from '@actions/core';
 import axios from 'axios';
-import fs from 'fs';
 import stringArgv from 'string-argv';
 
 async function validateSubscription() {
