@@ -17,7 +17,7 @@ jobs:
           # see the following:
           # https://github.com/actions/setup-node?tab=readme-ov-file#supported-version-syntax
           # https://github.com/nvm-sh/nvm/issues/1998#issuecomment-594958684
-          - 20
+          - 24
           - lts/*
           - latest
 
@@ -48,6 +48,12 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Use Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24
+          cache: npm
 
       - name: Install deps
         run: npm ci
@@ -83,6 +89,13 @@ jobs:
       # This step builds the `rdme` action code so we can do that.
       #
       # This step is not required for syncing your docs to ReadMe!
+      - name: Use Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: rdme-repo/package-lock.json
+
       - name: Rebuild GitHub Action for testing purposes
         # We manually invoke `bin/write-gha-pjson.js` here because
         # GitHub Actions does not support `pre` scripts for local actions.

@@ -1,3 +1,5 @@
+[![StepSecurity Maintained Action](https://raw.githubusercontent.com/step-security/maintained-actions-assets/main/assets/maintained-action-banner.png)](https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions)
+
 <p align="center">
   <a href="https://github.com/step-security/readmeio-rdme"><img src="https://img.shields.io/github/actions/workflow/status/step-security/readmeio-rdme/ci.yml?branch=main&style=for-the-badge" alt="Build status"></a>
 </p>
