@@ -14,17 +14,6 @@ export default async function promptTerminal<T extends string = string>(
   options?: prompts.Options,
 ): Promise<prompts.Answers<T>> {
   /**
-   * The CTRL+C handler discussed above.
-   * @see {@link https://github.com/terkelg/prompts#optionsoncancel}
-   */
-  const onCancel = () => {
-    process.stdout.write('\n');
-    process.stdout.write('Thanks for using rdme! See you soon ✌️');
-    process.stdout.write('\n\n');
-    process.exit(1);
-  };
-
-  /**
    * Runs a check before every prompt renders to make sure that
    * prompt is not being run in a CI environment.
    */
@@ -42,11 +31,24 @@ export default async function promptTerminal<T extends string = string>(
   }
 
   if (Array.isArray(questions)) {
-    // biome-ignore lint/style/noParameterAssign: This is safe to rewrite our incoming questions for `prompts`.
+    // oxlint-disable-next-line no-param-reassign -- This is safe to rewrite our incoming questions for `prompts`.
     questions = questions.map(question => ({ onRender, ...question }));
   } else {
+    // oxlint-disable-next-line no-param-reassign
     questions.onRender = onRender;
   }
 
-  return prompts(questions, { onCancel, ...options });
+  return prompts(questions, {
+    /**
+     * The CTRL+C handler discussed above.
+     * @see {@link https://github.com/terkelg/prompts#optionsoncancel}
+     */
+    onCancel: () => {
+      process.stdout.write('\n');
+      process.stdout.write('Thanks for using rdme! See you soon ✌️');
+      process.stdout.write('\n\n');
+      process.exit(1);
+    },
+    ...options,
+  });
 }

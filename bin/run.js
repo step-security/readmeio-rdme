@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 
 import * as core from '@actions/core';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import stringArgv from 'string-argv';
 
 async function validateSubscription() {
@@ -19,10 +19,10 @@ async function validateSubscription() {
   const docsUrl = 'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions';
 
   core.info('');
-  core.info('[1;36mStepSecurity Maintained Action[0m');
+  core.info('[1;36mStepSecurity Maintained Action[0m');
   core.info(`Secure drop-in replacement for ${upstream}`);
-  if (repoPrivate === false) core.info('[32m✓ Free for public repositories[0m');
-  core.info(`[36mLearn more:[0m ${docsUrl}`);
+  if (repoPrivate === false) core.info('[32m✓ Free for public repositories[0m');
+  core.info(`[36mLearn more:[0m ${docsUrl}`);
   core.info('');
 
   if (repoPrivate === false) return;
@@ -37,9 +37,9 @@ async function validateSubscription() {
       { timeout: 3000 },
     );
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 403) {
-      core.error(`[1;31mThis action requires a StepSecurity subscription for private repositories.[0m`);
-      core.error(`[31mLearn how to enable a subscription: ${docsUrl}[0m`);
+    if (isAxiosError(error) && error.response?.status === 403) {
+      core.error(`[1;31mThis action requires a StepSecurity subscription for private repositories.[0m`);
+      core.error(`[31mLearn how to enable a subscription: ${docsUrl}[0m`);
       process.exit(1);
     }
     core.info('Timeout or API not reachable. Continuing to next step.');
@@ -49,7 +49,8 @@ async function validateSubscription() {
 async function main() {
   await validateSubscription();
   /**
-   * Disables the oclif engine warning. For some reason the versions that are flagged are totally separate from our engines requirements.
+   * Disables the oclif engine warning. For some reason the versions that are flagged are totally
+   * separate from our engines requirements.
    *
    * @see {@link https://github.com/oclif/core/blob/70d3f192862a5adb548cbda68c6ee1ca8f724110/src/index.ts#L12}
    */
@@ -62,11 +63,10 @@ async function main() {
   }
   await execute(opts).then(msg => {
     if (msg && typeof msg === 'string') {
-      // biome-ignore lint/suspicious/noConsole: This is in an executable.
+      // oxlint-disable-next-line no-console -- This is in an executable.
       console.log(msg);
     }
   });
 }
 
-// biome-ignore lint/nursery/noFloatingPromises: We use rollup to bundle this file and it doesn't play well with top-level await.
 main();

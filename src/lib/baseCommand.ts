@@ -1,7 +1,8 @@
-import type { Config, Hook, Interfaces } from '@oclif/core';
+// oxlint-disable no-console -- We are printing errors to the terminal.
 import type { COMMANDS } from '../index.js';
 import type { CreateGHAHook, CreateGHAHookOptsInClass } from './hooks/createGHA.js';
 import type { ResponseBody } from './readmeAPIFetch.js';
+import type { Config, Hook, Interfaces } from '@oclif/core';
 
 import { format } from 'node:util';
 
@@ -110,10 +111,8 @@ export default abstract class BaseCommand<T extends typeof OclifCommand> extends
     // If this is a soft error then we should output the result as a regular log but exit the CLI
     // with an error status code.
     if (err.name === 'SoftError') {
-      // biome-ignore lint/suspicious/noConsole: We are printing errors to the terminal.
       console.log(err.message);
     } else {
-      // biome-ignore lint/suspicious/noConsole: We are printing errors to the terminal.
       console.error(chalk.red(`\n${message}\n`));
     }
 
@@ -125,7 +124,9 @@ export default abstract class BaseCommand<T extends typeof OclifCommand> extends
    * that takes the result and sets a GitHub step output parameter to the result
    * when being run from a GitHub Actions runner.
    */
+  // oxlint-disable-next-line no-underscore-dangle
   protected async _run<U>(): Promise<U> {
+    // oxlint-disable-next-line no-underscore-dangle
     const result: U = await super._run();
     if (isGHA() && !isTest() && result) {
       core.setOutput('rdme', result);

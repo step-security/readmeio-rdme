@@ -1,8 +1,8 @@
-import type { Hook } from '@oclif/core';
-import type { SchemaObject } from 'oas/types';
 import type { APIv2PageCommands, CommandClass } from '../index.js';
 import type { APIv2ErrorResponse } from './apiError.js';
 import type { SpecFileType } from './prepareOas.js';
+import type { Hook } from '@oclif/core';
+import type { SchemaObject } from 'oas/types';
 
 import path from 'node:path';
 
@@ -13,11 +13,26 @@ import { APIv1Error, APIv2Error } from './apiError.js';
 import config from './config.js';
 import { getPkgVersion } from './getPkg.js';
 import { git } from './git.js';
-import isCI, { ciName, isGHA } from './isCI.js';
+import isCI, { ciName, isGHA, isTest } from './isCI.js';
 import { debug, warn } from './logger.js';
 import readmeAPIv2Oas from './types/openapiDoc.js';
 
 const SUCCESS_NO_CONTENT = 204;
+
+/**
+ * Configuration for retry logic with exponential backoff.
+ * Used when the API returns 5xx server errors.
+ */
+export const MAX_RETRIES = 3;
+const INITIAL_DELAY_MS = 1000;
+
+/**
+ * Determines if a response status code is retryable.
+ * Only retry on 5xx server errors, not on 4xx client errors.
+ */
+function isRetryableStatus(status: number): boolean {
+  return status >= 500 && status < 600;
+}
 
 /**
  * This contains a few pieces of information about a file so
@@ -25,9 +40,9 @@ const SUCCESS_NO_CONTENT = 204;
  */
 interface FilePathDetails {
   /** The URL or local file path */
-  filePath: string;
+  path: string;
   /** This is derived from the `oas-normalize` `type` property. */
-  fileType: SpecFileType;
+  type: SpecFileType;
 }
 
 function getProxy() {
@@ -60,7 +75,7 @@ export interface Mappings {
 /**
  * A generic response body type for responses from the ReadMe API.
  */
-// biome-ignore lint/suspicious/noExplicitAny: Generic typing for responses.
+// oxlint-disable-next-line typescript/no-empty-object-type -- Generic typing for responses.
 export interface ResponseBody extends Record<string, any> {}
 
 export const emptyMappings: Mappings = { categories: {}, parentPages: {} };
@@ -82,7 +97,7 @@ function parseWarningHeader(
     let previous: WarningHeader;
 
     return warnings.reduce<WarningHeader[]>((all, w) => {
-      // biome-ignore lint/style/noParameterAssign: We need to mutate this variable for reducing.
+      // oxlint-disable-next-line no-param-reassign -- We need to mutate this variable for reducing.
       w = w.trim();
       const newError = w.match(/^([0-9]{3}) (.*)/);
       if (newError) {
@@ -117,16 +132,16 @@ export function getUserAgent() {
  * Creates a relative path for the file from the root of the repo,
  * otherwise returns the path
  */
-async function normalizeFilePath(opts: FilePathDetails) {
-  if (opts.fileType === 'path') {
+async function normalizeFilePath(file: FilePathDetails) {
+  if (file.type === 'path') {
     const repoRoot = await git.revparse(['--show-toplevel']).catch(e => {
       debug(`[fetch] error grabbing git root: ${e.message}`);
       return '';
     });
 
-    return path.relative(repoRoot, opts.filePath);
+    return path.relative(repoRoot, file.path);
   }
-  return opts.filePath;
+  return file.path;
 }
 
 /**
@@ -134,6 +149,7 @@ async function normalizeFilePath(opts: FilePathDetails) {
  */
 function sanitizeHeaders(headers: Headers) {
   const raw = Array.from(headers.entries()).reduce<Record<string, string>>((prev, current) => {
+    // oxlint-disable-next-line no-param-reassign -- We need to mutate this variable for reducing.
     prev[current[0]] = current[0].toLowerCase() === 'authorization' ? 'redacted' : current[1];
     return prev;
   }, {});
@@ -148,16 +164,20 @@ function sanitizeHeaders(headers: Headers) {
 export async function readmeAPIv1Fetch(
   /** The pathname to make the request to. Must have a leading slash. */
   pathname: string,
-  options: RequestInit = { headers: new Headers() },
-  /** optional object containing information about the file being sent.
-   * We use this to construct a full source URL for the file. */
-  fileOpts: FilePathDetails = { filePath: '', fileType: false },
+  request: RequestInit = { headers: new Headers() },
+  opts?: {
+    /**
+     * Optional object containing information about the file being sent. We use this to construct a
+     * full source URL for the file.
+     */
+    file?: FilePathDetails;
+  },
 ) {
   let source = 'cli';
-  let headers = options.headers as Headers;
+  let headers = request.headers as Headers;
 
-  if (!(options.headers instanceof Headers)) {
-    headers = new Headers(options.headers);
+  if (!(request.headers instanceof Headers)) {
+    headers = new Headers(request.headers);
   }
 
   headers.set('User-Agent', getUserAgent());
@@ -170,21 +190,22 @@ export async function readmeAPIv1Fetch(
     if (process.env.GITHUB_RUN_NUMBER) headers.set('x-github-run-number', process.env.GITHUB_RUN_NUMBER);
     if (process.env.GITHUB_SHA) headers.set('x-github-sha', process.env.GITHUB_SHA);
 
-    const filePath = await normalizeFilePath(fileOpts);
-
-    if (filePath) {
-      /**
-       * Constructs a full URL to the file using GitHub Actions runner variables
-       * @see {@link https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables}
-       * @example https://github.com/step-security/readmeio-rdme/blob/v10/documentation/rdme.md
-       */
-      try {
-        const sourceUrl = new URL(
-          `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_SHA}/${filePath}`,
-        ).href;
-        headers.set('x-readme-source-url', sourceUrl);
-      } catch (e) {
-        debug(`error constructing github source url: ${e.message}`);
+    if (opts?.file) {
+      const filePath = await normalizeFilePath(opts?.file);
+      if (filePath) {
+        /**
+         * Constructs a full URL to the file using GitHub Actions runner variables
+         * @see {@link https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables}
+         * @example https://github.com/step-security/readmeio-rdme/blob/v10/documentation/rdme.md
+         */
+        try {
+          const sourceUrl = new URL(
+            `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_SHA}/${filePath}`,
+          ).href;
+          headers.set('x-readme-source-url', sourceUrl);
+        } catch (e) {
+          debug(`error constructing github source url: ${e.message}`);
+        }
       }
     }
   }
@@ -195,19 +216,19 @@ export async function readmeAPIv1Fetch(
 
   headers.set('x-readme-source', source);
 
-  if (fileOpts.filePath && fileOpts.fileType === 'url') {
-    headers.set('x-readme-source-url', fileOpts.filePath);
+  if (opts?.file && opts?.file.path && opts.file.type === 'url') {
+    headers.set('x-readme-source-url', opts.file.path);
   }
 
   const fullUrl = `${config.host.v1}${pathname}`;
   const proxy = getProxy();
 
   debug(
-    `making ${(options.method || 'get').toUpperCase()} request to ${fullUrl} ${proxy ? `with proxy ${proxy} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
+    `making ${(request.method || 'get').toUpperCase()} request to ${fullUrl} ${proxy ? `with proxy ${proxy} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
   );
 
   return fetch(fullUrl, {
-    ...options,
+    ...request,
     headers,
     // @ts-expect-error we need to clean up our undici usage here ASAP
     dispatcher: proxy ? new ProxyAgent(proxy) : undefined,
@@ -234,22 +255,26 @@ export async function readmeAPIv1Fetch(
  */
 export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
   /**
-   * `this` does not have to be a hook, it can also be a Command class.
-   * This type ensures that `this` has the `config` and `debug` properties.
+   * `this` does not have to be a hook, it can also be a Command class. This type ensures that
+   * `this` has the `config` and `debug` properties.
    */
   this: T,
   /** The pathname to make the request to. Must have a leading slash. */
   pathname: string,
-  options: RequestInit = { headers: new Headers() },
-  /** optional object containing information about the file being sent.
-   * We use this to construct a full source URL for the file. */
-  fileOpts: FilePathDetails = { filePath: '', fileType: false },
+  request: RequestInit = { headers: new Headers() },
+  opts?: {
+    /**
+     * Optional object containing information about the file being sent. We use this to construct a
+     * full source URL for the file.
+     */
+    file?: FilePathDetails;
+  },
 ) {
   let source = 'cli';
-  let headers = options.headers as Headers;
+  let headers = request.headers as Headers;
 
-  if (!(options.headers instanceof Headers)) {
-    headers = new Headers(options.headers);
+  if (!(request.headers instanceof Headers)) {
+    headers = new Headers(request.headers);
   }
 
   headers.set(
@@ -269,21 +294,22 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
     if (process.env.GITHUB_RUN_NUMBER) headers.set('x-github-run-number', process.env.GITHUB_RUN_NUMBER);
     if (process.env.GITHUB_SHA) headers.set('x-github-sha', process.env.GITHUB_SHA);
 
-    const filePath = await normalizeFilePath(fileOpts);
-
-    if (filePath) {
-      /**
-       * Constructs a full URL to the file using GitHub Actions runner variables
-       * @see {@link https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables}
-       * @example https://github.com/step-security/readmeio-rdme/blob/v10/documentation/rdme.md
-       */
-      try {
-        const sourceUrl = new URL(
-          `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_SHA}/${filePath}`,
-        ).href;
-        headers.set('x-readme-source-url', sourceUrl);
-      } catch (e) {
-        this.debug(`error constructing github source url: ${e.message}`);
+    if (opts?.file) {
+      const filePath = await normalizeFilePath(opts.file);
+      if (filePath) {
+        /**
+         * Constructs a full URL to the file using GitHub Actions runner variables
+         * @see {@link https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables}
+         * @example https://github.com/step-security/readmeio-rdme/blob/v10/documentation/rdme.md
+         */
+        try {
+          const sourceUrl = new URL(
+            `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/blob/${process.env.GITHUB_SHA}/${filePath}`,
+          ).href;
+          headers.set('x-readme-source-url', sourceUrl);
+        } catch (e) {
+          this.debug(`error constructing github source url: ${e.message}`);
+        }
       }
     }
   }
@@ -294,24 +320,52 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
 
   headers.set('x-readme-source', source);
 
-  if (fileOpts.filePath && fileOpts.fileType === 'url') {
-    headers.set('x-readme-source-url', fileOpts.filePath);
+  if (opts?.file && opts.file.path && opts.file.type === 'url') {
+    headers.set('x-readme-source-url', opts.file.path);
   }
 
   const fullUrl = `${config.host.v2}${pathname}`;
   const proxy = getProxy();
 
   this.debug(
-    `making ${(options.method || 'get').toUpperCase()} request to ${fullUrl} ${proxy ? `with proxy ${proxy} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
+    `making ${(request.method || 'get').toUpperCase()} request to ${fullUrl} ${proxy ? `with proxy ${proxy} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
   );
 
-  return fetch(fullUrl, {
-    ...options,
+  const fetchOptions: RequestInit & { dispatcher?: ProxyAgent } = {
+    ...request,
     headers,
-    // @ts-expect-error we need to clean up our undici usage here ASAP
     dispatcher: proxy ? new ProxyAgent(proxy) : undefined,
-  })
-    .then(res => {
+  };
+
+  // Retry logic with exponential backoff for 5xx server errors
+  let lastError: Error | undefined;
+
+  // oxlint-disable no-await-in-loop -- Sequential delays required for retry logic with exponential backoff
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+    if (attempt > 0) {
+      const delay = (isTest() ? 10 : INITIAL_DELAY_MS) * 2 ** (attempt - 1);
+      this.debug(`retrying request (attempt ${attempt}/${MAX_RETRIES}) after ${delay}ms delay`);
+      await new Promise(resolve => {
+        setTimeout(resolve, delay);
+      });
+    }
+
+    try {
+      const res = await fetch(fullUrl, fetchOptions);
+
+      // If we get a 5xx error and have retries left, log and continue to next attempt
+      if (isRetryableStatus(res.status) && attempt < MAX_RETRIES) {
+        const body = await res.text();
+        this.debug(
+          `received retryable status ${res.status} (attempt ${attempt + 1}/${MAX_RETRIES + 1}), will retry. Response preview: ${body.slice(0, 200)}`,
+        );
+
+        lastError = new Error(`Server returned ${res.status}`);
+        // oxlint-disable-next-line no-continue
+        continue;
+      }
+
+      // Handle warning headers on successful responses
       const warningHeader = res.headers.get('Warning');
       if (warningHeader) {
         this.debug(`received warning header: ${warningHeader}`);
@@ -320,13 +374,24 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
           this.warn(`⚠️ ReadMe API Warning: ${warning.message}`);
         });
       }
+
       return res;
-    })
-    .catch(e => {
-      this.debug(`error making fetch request: ${e}`);
+    } catch (e) {
+      this.debug(`error making fetch request (attempt ${attempt + 1}/${MAX_RETRIES + 1}): ${e}`);
       this.debug(e.stack);
-      throw e;
-    });
+      lastError = e;
+
+      // If we've exhausted all retries then throw the error, otherwise continue to next retry
+      // attempt.
+      if (attempt >= MAX_RETRIES) {
+        throw e;
+      }
+    }
+  }
+  // oxlint-enable no-await-in-loop
+
+  // This should only be reached if all retries failed
+  throw lastError || new Error('Request failed after maximum retries');
 }
 
 /**
@@ -355,7 +420,6 @@ export async function handleAPIv1Res(
     const text = await res.text();
     debug(`received status code ${res.status} from ${res.url} with JSON response: ${text}`);
     try {
-      // biome-ignore lint/suspicious/noExplicitAny: We do not have TS types for APIv1 responses.
       const body = JSON.parse(text) as any;
       if (body.error && rejectOnJsonError) {
         throw new APIv1Error(body);
@@ -368,6 +432,7 @@ export async function handleAPIv1Res(
       debug(`received the following error when attempting to parse JSON response: ${e.message}`);
       throw new Error(
         'The ReadMe API responded with an unexpected error. Please try again and if this issue persists, get in touch with us at support@readme.io.',
+        { cause: e },
       );
     }
   }
@@ -423,6 +488,7 @@ export async function handleAPIv2Res<R extends ResponseBody = ResponseBody, T ex
       this.debug(`received the following error when attempting to parse JSON response: ${e.message}`);
       throw new Error(
         'The ReadMe API responded with an unexpected error. Please try again and if this issue persists, get in touch with us at support@readme.io.',
+        { cause: e },
       );
     }
   }
