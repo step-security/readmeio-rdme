@@ -1,6 +1,6 @@
 {
-  "name": "readmeio-rdme",
-  "version": "10.7.0",
+  "name": "rdme",
+  "version": "10.8.0",
   "description": "ReadMe's official CLI and GitHub Action.",
   "keywords": [
     "api",
@@ -20,13 +20,13 @@
     "swagger"
   ],
   "bugs": {
-    "url": "https://github.com/step-security/readmeio-rdme/issues"
+    "url": "https://github.com/readmeio/rdme/issues"
   },
   "license": "MIT",
-  "author": "step-security",
+  "author": "ReadMe <support@readme.io> (https://readme.com)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/step-security/readmeio-rdme.git"
+    "url": "git+https://github.com/readmeio/rdme.git"
   },
   "bin": {
     "rdme": "bin/run.js"
@@ -53,6 +53,7 @@
     "lint:ts:write": "npx oxlint --fix",
     "prebuild": "rm -rf dist/",
     "prepack": "npm run build",
+    "prepare": "husky",
     "pretest": "npm run build",
     "schemas:check": "./bin/json-schema-store.js",
     "schemas:write": "./bin/json-schema-store.js --update && npx oxfmt --write test/helpers/github-workflow-schema.json",
@@ -61,14 +62,13 @@
   },
   "dependencies": {
     "@actions/core": "^3.0.1",
-    "@oclif/core": "^4.0.29",
-    "@oclif/plugin-autocomplete": "^3.2.46",
-    "@oclif/plugin-help": "^6.2.45",
-    "@oclif/plugin-plugins": "^5.4.62",
-    "@oclif/plugin-warn-if-update-available": "^3.1.61",
+    "@oclif/core": "^4.11.2",
+    "@oclif/plugin-autocomplete": "^3.2.49",
+    "@oclif/plugin-help": "^6.2.48",
+    "@oclif/plugin-plugins": "^5.4.67",
+    "@oclif/plugin-warn-if-update-available": "^3.1.64",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "axios": "^1.13.5",
     "chalk": "^5.3.0",
     "ci-info": "^4.4.0",
     "configstore": "^7.0.0",
@@ -78,11 +78,11 @@
     "js-yaml": "^4.1.1",
     "json-schema-to-ts": "^3.1.1",
     "mime-types": "^3.0.1",
-    "oas": "^33.0.0",
+    "oas": "^33.1.4",
     "oas-normalize": "^16.0.4",
     "ora": "^9.4.0",
     "prompts": "^2.4.2",
-    "semver": "^7.5.3",
+    "semver": "^7.8.0",
     "simple-git": "^3.36.0",
     "slugify": "^1.6.9",
     "string-argv": "^0.3.2",
@@ -93,10 +93,12 @@
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
     "@oclif/test": "^4.1.18",
     "@readme/better-ajv-errors": "^2.3.2",
     "@readme/oas-examples": "^8.2.1",
-    "@readme/oxlint-config": "^1.2.0",
+    "@readme/oxlint-config": "^1.3.2",
     "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
@@ -108,22 +110,42 @@
     "@types/semver": "^7.3.12",
     "@types/toposort": "^2.0.7",
     "@types/unzipper": "^0.10.11",
-    "@vitest/coverage-v8": "^4.1.5",
-    "@vitest/expect": "^4.1.5",
-    "knip": "^6.7.0",
-    "nock": "^14.0.13",
+    "@vitest/coverage-v8": "^4.1.6",
+    "@vitest/expect": "^4.1.6",
+    "husky": "^9.0.10",
+    "knip": "^6.13.1",
+    "nock": "^14.0.15",
     "oclif": "^4.23.0",
     "openapi-types": "^12.1.3",
-    "oxfmt": "^0.48.0",
-    "oxlint": "^1.63.0",
+    "oxfmt": "^0.49.0",
+    "oxlint": "^1.64.0",
     "rollup": "^4.60.2",
     "rollup-plugin-esbuild": "^6.2.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.8.2",
-    "vitest": "^4.1.5"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
   },
-  "overrides": {
-    "@aws-sdk/xml-builder": "3.972.19"
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "body-max-line-length": [
+        0,
+        "always",
+        "Infinity"
+      ],
+      "footer-max-line-length": [
+        0,
+        "always",
+        "Infinity"
+      ],
+      "scope-case": [
+        2,
+        "never",
+        "upper-case"
+      ]
+    }
   },
   "oclif": {
     "bin": "rdme",
@@ -160,6 +182,6 @@
     }
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=20.10.0"
   }
 }
