@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "mode": "derivative",
+  "upstream": "readmeio/rdme",
+  "release_version_type": "vx.x.x",
+  "action_type": "node",
+  "vendor_series_version": "2026.06.1",
+  "last_success": {
+    "upstream_tag": "v10.7.0",
+    "imported_at": "2026-07-10T10:11:06.613Z"
+  },
+  "last_attempt": {
+    "upstream_tag": "v10.8.0",
+    "status": "failed",
+    "reason": "build_failed",
+    "at": "2026-07-10T10:12:37.725Z"
+  },
+  "tier": "A",
+  "policy": {
+    "stepwise_imports": true,
+    "skip_dist_from_upstream": true
+  }
+}
