@@ -6,6 +6,8 @@ import * as core from '@actions/core';
 import axios, { isAxiosError } from 'axios';
 import stringArgv from 'string-argv';
 
+import { normalizeStringArgvForGha } from '../dist/lib/normalizeStringArgvForGha.js';
+
 async function validateSubscription() {
   let repoPrivate;
   const eventPath = process.env.GITHUB_EVENT_PATH;
@@ -61,7 +63,7 @@ async function main() {
   const { execute } = await import('@oclif/core');
   const opts = { dir: import.meta.url };
   if (process.env.INPUT_RDME) {
-    opts.args = stringArgv(process.env.INPUT_RDME);
+    opts.args = normalizeStringArgvForGha(stringArgv(process.env.INPUT_RDME));
   }
   await execute(opts).then(msg => {
     if (msg && typeof msg === 'string') {
