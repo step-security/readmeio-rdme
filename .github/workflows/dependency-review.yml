@@ -25,7 +25,3 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@05fe4576374b728f0c523d6a13d64c25081e0803 # v4.8.3
-        with:
-          # npm@11.17.0 (via @oclif/plugin-plugins) bundles undici@6.26.0.
-          # Unfixable without overrides/resolutions; not used for app HTTP.
-          allow-ghsas: GHSA-vxpw-j846-p89q, GHSA-p88m-4jfj-68fv, GHSA-35p6-xmwp-9g52, GHSA-g8m3-5g58-fq7m
