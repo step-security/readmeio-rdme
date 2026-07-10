@@ -1,19 +1,19 @@
-[[IgnoredVulns]]
-id = "GHSA-h67p-54hq-rp68"
-reason = "js-yaml@3.14.2 is a transitive dependency via gray-matter@4.0.3 (latest), which requires js-yaml ^3.13.1 and has no js-yaml 4.x support. The vulnerable load() function is never reached: gray-matter uses safeLoad() for YAML parsing and rdme explicitly disables the javascript engine in grayMatter() options."
-
+# undici@6.26.0 is bundled inside npm@11.17.0 (latest) via
+# @oclif/plugin-plugins > npm bundleDependencies. Cannot upgrade without
+# overrides/resolutions. rdme's top-level undici@6.27.0 is used for all
+# outbound HTTP; npm's bundled undici is only used when npm installs plugins.
 [[IgnoredVulns]]
 id = "GHSA-35p6-xmwp-9g52"
-reason = "undici@6.26.0 is bundled inside npm@11.17.0 (the latest available npm) via @oclif/plugin-plugins > npm bundleDependencies. Cannot be upgraded without overrides/resolutions. rdme uses its own top-level undici@6.27.0 for all outbound HTTP calls; npm's bundled undici is only used internally when npm installs plugins at runtime."
+reason = "undici@6.26.0 is bundled inside npm@11.17.0 via @oclif/plugin-plugins > npm (bundleDependencies). Unfixable without overrides/resolutions. Not used for rdme HTTP traffic (top-level undici@6.27.0 is)."
 
 [[IgnoredVulns]]
 id = "GHSA-g8m3-5g58-fq7m"
-reason = "undici@6.26.0 is bundled inside npm@11.17.0 (the latest available npm) via @oclif/plugin-plugins > npm bundleDependencies. Cannot be upgraded without overrides/resolutions. rdme uses its own top-level undici@6.27.0 for all outbound HTTP calls; npm's bundled undici is only used internally when npm installs plugins at runtime."
+reason = "undici@6.26.0 is bundled inside npm@11.17.0 via @oclif/plugin-plugins > npm (bundleDependencies). Unfixable without overrides/resolutions. Not used for rdme HTTP traffic (top-level undici@6.27.0 is)."
 
 [[IgnoredVulns]]
 id = "GHSA-p88m-4jfj-68fv"
-reason = "undici@6.26.0 is bundled inside npm@11.17.0 (the latest available npm) via @oclif/plugin-plugins > npm bundleDependencies. Cannot be upgraded without overrides/resolutions. rdme uses its own top-level undici@6.27.0 for all outbound HTTP calls; npm's bundled undici is only used internally when npm installs plugins at runtime."
+reason = "undici@6.26.0 is bundled inside npm@11.17.0 via @oclif/plugin-plugins > npm (bundleDependencies). Unfixable without overrides/resolutions. Not used for rdme HTTP traffic (top-level undici@6.27.0 is)."
 
 [[IgnoredVulns]]
 id = "GHSA-vxpw-j846-p89q"
-reason = "undici@6.26.0 is bundled inside npm@11.17.0 (the latest available npm) via @oclif/plugin-plugins > npm bundleDependencies. Cannot be upgraded without overrides/resolutions. rdme uses its own top-level undici@6.27.0 for all outbound HTTP calls; npm's bundled undici is only used internally when npm installs plugins at runtime."
+reason = "undici@6.26.0 is bundled inside npm@11.17.0 via @oclif/plugin-plugins > npm (bundleDependencies). Unfixable without overrides/resolutions. Not used for rdme HTTP traffic (top-level undici@6.27.0 is)."
