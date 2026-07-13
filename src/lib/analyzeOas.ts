@@ -31,7 +31,7 @@ export interface Analysis extends OASAnalysis {
     discriminators: AnalyzedFeature;
     links: AnalyzedFeature;
     polymorphism: AnalyzedFeature;
-    refNames: OASAnalysisFeature;
+    references: OASAnalysisFeature;
     serverVariables: AnalyzedFeature;
     style: AnalyzedFeature;
     webhooks: AnalyzedFeature;
@@ -101,10 +101,12 @@ const OPENAPI_FEATURE_DOCS: Record<
       '3.1': 'https://json-schema.org/understanding-json-schema/reference/combining.html',
     },
   },
-  refNames: {
-    description:
-      'Determines the presence of the `x-readme-ref-name` extension that ReadMe uses when dereferencing API definitions.',
-    hidden: true,
+  references: {
+    description: 'Determines the presence of the `$ref` pointers.',
+    url: {
+      '3.0': 'https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.4.md#reference-object',
+      '3.1': 'https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.1.md#reference-object',
+    },
   },
   serverVariables: {
     description: 'Server variables allow to do user-supplied variable subsitituions within your API server URL.',
@@ -164,10 +166,7 @@ async function analyzeOas(definition: OASDocument) {
 }
 
 export function getSupportedFeatures() {
-  return Object.keys(OPENAPI_FEATURE_DOCS).filter(feature => {
-    // We don't need to expose `refNames` and `x-readme-ref-name` extension lookups in this command.
-    return feature !== 'refNames';
-  });
+  return Object.keys(OPENAPI_FEATURE_DOCS);
 }
 
 export default analyzeOas;

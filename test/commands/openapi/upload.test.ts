@@ -5,9 +5,10 @@ import fs from 'node:fs/promises';
 import nock from 'nock';
 import prompts from 'prompts';
 import slugify from 'slugify';
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Command from '../../../src/commands/openapi/upload.js';
+import configstore from '../../../src/lib/configstore.js';
 import petstore from '../../__fixtures__/petstore-simple-weird-version.json' with { type: 'json' };
 import { getAPIv2Mock, getAPIv2MockForGHA } from '../../helpers/get-api-mock.js';
 import { githubActionsEnv } from '../../helpers/git-mock.js';
@@ -42,10 +43,52 @@ describe('rdme openapi upload', () => {
 
       expect(result).toMatchSnapshot();
     });
+
+    describe('API key validation', () => {
+      it('should error when `--key` is empty', async () => {
+        const result = await run(['--branch', branch, filename, '--key', '']);
+
+        expect(result.error?.message).toContain('No project API key was specified.');
+      });
+
+      it('should error when `--key` is whitespace-only', async () => {
+        const result = await run(['--branch', branch, filename, '--key', '   ']);
+
+        expect(result.error?.message).toContain('No project API key was specified.');
+      });
+
+      describe('in CI without env or configstore key', () => {
+        const originalGet = configstore.get.bind(configstore);
+
+        beforeEach(() => {
+          vi.stubEnv('TEST_RDME_CI', 'true');
+          vi.stubEnv('RDME_API_KEY', '');
+          vi.stubEnv('README_API_KEY', '');
+          vi.spyOn(configstore, 'get').mockImplementation((storeKey: string) => {
+            if (storeKey === 'apiKey') return;
+            return originalGet(storeKey);
+          });
+        });
+
+        afterEach(() => {
+          vi.unstubAllEnvs();
+          vi.restoreAllMocks();
+        });
+
+        it('should error with guidance when no API key is available', async () => {
+          const result = await run(['--branch', branch, filename]);
+
+          expect(result.error?.message).toMatchInlineSnapshot(
+            `"No project API key was provided. Please provide one with \`--key\` or the \`RDME_API_KEY\` or \`README_API_KEY\` environment variables."`,
+          );
+        });
+      });
+    });
   });
 
   describe('given that the API definition is a local file', () => {
     it('should create a new JSON API definition in ReadMe', async () => {
+      prompts.inject([true]);
       const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
         .get(`/branches/${branch}/apis`)
         .reply(200, { data: [] })
@@ -71,6 +114,7 @@ describe('rdme openapi upload', () => {
     });
 
     it('should create a new JSON API definition in ReadMe with deprecated `--version` flag', async () => {
+      prompts.inject([true]);
       const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
         .get(`/branches/${branch}/apis`)
         .reply(200, { data: [] })
@@ -96,6 +140,7 @@ describe('rdme openapi upload', () => {
     });
 
     it('should create a new YAML API definition in ReadMe', async () => {
+      prompts.inject([true]);
       const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
         .get(`/branches/${branch}/apis`)
         .reply(200, { data: [] })
@@ -144,6 +189,8 @@ describe('rdme openapi upload', () => {
     });
 
     it('should handle upload failures', async () => {
+      prompts.inject([true]);
+
       const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
         .get(`/branches/${branch}/apis`)
         .reply(200, { data: [] })
@@ -156,7 +203,7 @@ describe('rdme openapi upload', () => {
         )
         .reply(200, {
           data: {
-            upload: { status: 'fail' },
+            upload: { status: 'failed' },
             uri: `/branches/${branch}/apis/${slugifiedFilename}`,
           },
         });
@@ -166,6 +213,46 @@ describe('rdme openapi upload', () => {
       expect(result).toMatchSnapshot();
 
       mock.done();
+    });
+
+    describe('nested path create confirmation (CX-2743)', () => {
+      it('should abort if the user declines the nested path prompt', async () => {
+        prompts.inject([false]);
+        const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
+          .get(`/branches/${branch}/apis`)
+          .reply(200, { data: [] });
+
+        const result = await run(['--branch', branch, filename, '--key', key]);
+
+        expect(result).toMatchSnapshot();
+
+        mock.done();
+      });
+
+      it('should create a new API definition without prompting when `--confirm-overwrite` is passed', async () => {
+        const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
+          .get(`/branches/${branch}/apis`)
+          .reply(200, { data: [] })
+          .post(
+            `/branches/${branch}/apis`,
+            body =>
+              body.match(
+                `form-data; name="schema"; filename="${slugifiedFilename}"\r\nContent-Type: application/json`,
+              ) && body.match(`{"openapi":"3.0.0","info":{"version":"1.2.3","title":"Single Path",`),
+          )
+          .reply(200, {
+            data: {
+              upload: { status: 'done' },
+              uri: `/branches/${branch}/apis/${slugifiedFilename}`,
+            },
+          });
+
+        const result = await run(['--branch', branch, filename, '--key', key, '--confirm-overwrite']);
+
+        expect(result).toMatchSnapshot();
+
+        mock.done();
+      });
     });
 
     describe('and the `--slug` flag is passed', () => {
@@ -375,6 +462,7 @@ describe('rdme openapi upload', () => {
 
     describe('and the upload status initially is a pending state', () => {
       it('should poll the API until the upload is complete', async () => {
+        prompts.inject([true]);
         const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
           .get(`/branches/${branch}/apis`)
           .reply(200, { data: [] })
@@ -461,6 +549,7 @@ describe('rdme openapi upload', () => {
       });
 
       it('should poll the API and handle timeouts', async () => {
+        prompts.inject([true]);
         const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
           .get(`/branches/${branch}/apis`)
           .reply(200, { data: [] })
@@ -496,6 +585,7 @@ describe('rdme openapi upload', () => {
       });
 
       it('should poll the API once and handle a failure state with a 4xx', async () => {
+        prompts.inject([true]);
         const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
           .get(`/branches/${branch}/apis`)
           .reply(200, { data: [] })
@@ -525,6 +615,7 @@ describe('rdme openapi upload', () => {
       });
 
       it('should poll the API once and handle an unexpected state with a 2xx', async () => {
+        prompts.inject([true]);
         const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
           .get(`/branches/${branch}/apis`)
           .reply(200, { data: [] })
@@ -546,13 +637,17 @@ describe('rdme openapi upload', () => {
           .get(`/branches/${branch}/apis/${slugifiedFilename}`)
           .reply(200, {
             data: {
-              upload: { status: 'something-unexpected' },
+              upload: {
+                status: 'failed',
+                reason: 'The API definition has validation errors.',
+              },
               uri: `/branches/${branch}/apis/${slugifiedFilename}`,
             },
           });
 
         const result = await run(['--branch', branch, filename, '--key', key]);
 
+        expect(result.error.message).toContain('The API definition has validation errors.');
         expect(result).toMatchSnapshot();
 
         mock.done();
@@ -591,6 +686,31 @@ describe('rdme openapi upload', () => {
         mock.done();
       });
 
+      it('should create a new API definition from a nested path without prompting in CI', async () => {
+        const mock = getAPIv2MockForGHA({ authorization: `Bearer ${key}` })
+          .get(`/branches/${branch}/apis`)
+          .reply(200, { data: [] })
+          .post(
+            `/branches/${branch}/apis`,
+            body =>
+              body.match(
+                `form-data; name="schema"; filename="${slugifiedFilename}"\r\nContent-Type: application/json`,
+              ) && body.match(`{"openapi":"3.0.0","info":{"version":"1.2.3","title":"Single Path",`),
+          )
+          .reply(200, {
+            data: {
+              upload: { status: 'done' },
+              uri: `/branches/${branch}/apis/${slugifiedFilename}`,
+            },
+          });
+
+        const result = await run(['--branch', branch, filename, '--key', key]);
+
+        expect(result).toMatchSnapshot();
+
+        mock.done();
+      });
+
       it('should error out if an object ID is passed and there is a legacy match found', async () => {
         const customSlug = '687855c3600c6e14c79a94cb';
         const existingFilename = 'legacy-spec.json';
@@ -608,6 +728,7 @@ describe('rdme openapi upload', () => {
 
     describe('given that the `--branch` flag is not set', () => {
       it('should default to the `stable` version', async () => {
+        prompts.inject([true]);
         const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
           .get('/branches/stable/apis')
           .reply(200, { data: [] })
@@ -635,6 +756,7 @@ describe('rdme openapi upload', () => {
       });
 
       it('should use the version from the spec file if --`useSpecVersion` is passed', async () => {
+        prompts.inject([true]);
         const altVersion = '1.2.3';
         const mock = getAPIv2Mock({ authorization: `Bearer ${key}` })
           .get(`/branches/${altVersion}/apis`)
