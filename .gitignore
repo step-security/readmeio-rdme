@@ -5,3 +5,4 @@ node_modules/
 
 # required for building with TS + oclif + GitHub Actions
 oclif.manifest.json
+.idea
