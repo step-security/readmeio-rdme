@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Use Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
@@ -90,7 +90,7 @@ jobs:
       #
       # This step is not required for syncing your docs to ReadMe!
       - name: Use Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: npm
@@ -109,6 +109,12 @@ jobs:
         uses: ./rdme-repo/
         with:
           rdme: openapi validate oas-examples-repo/3.1/json/petstore.json
+
+      # URL resolution uses `@apidevtools/json-schema-ref-parser`'s HTTP resolver, which
+      - name: Run `openapi validate` command from a URL
+        uses: ./rdme-repo/
+        with:
+          rdme: openapi validate https://raw.githubusercontent.com/readmeio/oas-examples/main/3.1/json/petstore.json
 
       - name: Run `openapi validate` command (legacy topic separator)
         uses: ./rdme-repo/
