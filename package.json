@@ -1,6 +1,6 @@
 {
   "name": "readmeio-rdme",
-  "version": "10.9.3",
+  "version": "10.9.6",
   "description": "ReadMe's official CLI and GitHub Action.",
   "keywords": [
     "api",
@@ -78,8 +78,8 @@
     "js-yaml": "^5.2.0",
     "json-schema-to-ts": "^3.1.1",
     "mime-types": "^3.0.1",
-    "oas": "^37.1.0",
-    "oas-normalize": "^16.1.0",
+    "oas": "^38.2.0",
+    "oas-normalize": "^17.0.0",
     "ora": "^9.4.1",
     "prompts": "^2.4.2",
     "remove-undefined-objects": "^9.0.0",
@@ -114,7 +114,7 @@
     "nock": "^14.0.16",
     "oclif": "^4.23.24",
     "openapi-types": "^12.1.3",
-    "oxfmt": "^0.57.0",
+    "oxfmt": "^0.61.0",
     "oxlint": "^1.72.0",
     "rollup": "^4.62.2",
     "rollup-plugin-esbuild": "^6.2.0",
