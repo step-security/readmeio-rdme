@@ -15,6 +15,7 @@ import { getPkgVersion } from './getPkg.js';
 import { git } from './git.js';
 import isCI, { ciName, isGHA, isTest } from './isCI.js';
 import { debug, warn } from './logger.js';
+import { redactProxyFromText, redactProxyUrl, redactResponseBody } from './secrets.js';
 import readmeAPIv2Oas from './types/openapiDoc.js';
 
 const SUCCESS_NO_CONTENT = 204;
@@ -222,9 +223,10 @@ export async function readmeAPIv1Fetch(
 
   const fullUrl = `${config.host.v1}${pathname}`;
   const proxy = getProxy();
+  const proxyForLog = proxy ? redactProxyUrl(proxy) : undefined;
 
   debug(
-    `making ${(request.method || 'get').toUpperCase()} request to ${fullUrl} ${proxy ? `with proxy ${proxy} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
+    `making ${(request.method || 'get').toUpperCase()} request to ${fullUrl} ${proxyForLog ? `with proxy ${proxyForLog} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
   );
 
   return fetch(fullUrl, {
@@ -245,7 +247,7 @@ export async function readmeAPIv1Fetch(
       return res;
     })
     .catch(e => {
-      debug(`error making fetch request: ${e}`);
+      debug(redactProxyFromText(`error making fetch request: ${e}`, proxy));
       throw e;
     });
 }
@@ -268,6 +270,12 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
      * full source URL for the file.
      */
     file?: FilePathDetails;
+
+    /**
+     * Number of retries for 5xx server errors and network failures. Defaults to
+     * {@link MAX_RETRIES}. Set to `0` to disable retries.
+     */
+    retries?: number;
   },
 ) {
   let source = 'cli';
@@ -326,9 +334,10 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
 
   const fullUrl = `${config.host.v2}${pathname}`;
   const proxy = getProxy();
+  const proxyForLog = proxy ? redactProxyUrl(proxy) : undefined;
 
   this.debug(
-    `making ${(request.method || 'get').toUpperCase()} request to ${fullUrl} ${proxy ? `with proxy ${proxy} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
+    `making ${(request.method || 'get').toUpperCase()} request to ${fullUrl} ${proxyForLog ? `with proxy ${proxyForLog} and ` : ''}with headers: ${sanitizeHeaders(headers)}`,
   );
 
   const fetchOptions: RequestInit & { dispatcher?: ProxyAgent } = {
@@ -339,12 +348,13 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
 
   // Retry logic with exponential backoff for 5xx server errors
   let lastError: Error | undefined;
+  const maxRetries = opts?.retries ?? MAX_RETRIES;
 
   // oxlint-disable no-await-in-loop -- Sequential delays required for retry logic with exponential backoff
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt += 1) {
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
     if (attempt > 0) {
       const delay = (isTest() ? 10 : INITIAL_DELAY_MS) * 2 ** (attempt - 1);
-      this.debug(`retrying request (attempt ${attempt}/${MAX_RETRIES}) after ${delay}ms delay`);
+      this.debug(`retrying request (attempt ${attempt}/${maxRetries}) after ${delay}ms delay`);
       await new Promise(resolve => {
         setTimeout(resolve, delay);
       });
@@ -354,10 +364,10 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
       const res = await fetch(fullUrl, fetchOptions);
 
       // If we get a 5xx error and have retries left, log and continue to next attempt
-      if (isRetryableStatus(res.status) && attempt < MAX_RETRIES) {
+      if (isRetryableStatus(res.status) && attempt < maxRetries) {
         const body = await res.text();
         this.debug(
-          `received retryable status ${res.status} (attempt ${attempt + 1}/${MAX_RETRIES + 1}), will retry. Response preview: ${body.slice(0, 200)}`,
+          `received retryable status ${res.status} (attempt ${attempt + 1}/${maxRetries + 1}), will retry. Response preview: ${redactResponseBody(body).slice(0, 200)}`,
         );
 
         lastError = new Error(`Server returned ${res.status}`);
@@ -377,13 +387,16 @@ export async function readmeAPIv2Fetch<T extends Hook.Context = Hook.Context>(
 
       return res;
     } catch (e) {
-      this.debug(`error making fetch request (attempt ${attempt + 1}/${MAX_RETRIES + 1}): ${e}`);
-      this.debug(e.stack);
+      this.debug(
+        redactProxyFromText(`error making fetch request (attempt ${attempt + 1}/${maxRetries + 1}): ${e}`, proxy),
+      );
+      const detail = e instanceof Error ? (e.stack ?? e.message) : String(e);
+      this.debug(redactProxyFromText(detail, proxy));
       lastError = e;
 
       // If we've exhausted all retries then throw the error, otherwise continue to next retry
       // attempt.
-      if (attempt >= MAX_RETRIES) {
+      if (attempt >= maxRetries) {
         throw e;
       }
     }
@@ -418,7 +431,7 @@ export async function handleAPIv1Res(
   if (extension === 'json') {
     // Just to be safe, we parse the response as text first in case the response is not valid JSON.
     const text = await res.text();
-    debug(`received status code ${res.status} from ${res.url} with JSON response: ${text}`);
+    debug(`received status code ${res.status} from ${res.url} with JSON response: ${redactResponseBody(text)}`);
     try {
       const body = JSON.parse(text) as any;
       if (body.error && rejectOnJsonError) {
@@ -443,7 +456,7 @@ export async function handleAPIv1Res(
   // If we receive a non-JSON response, it's likely an error.
   // Let's debug the raw response body and throw it.
   const body = await res.text();
-  debug(`received status code ${res.status} from ${res.url} with non-JSON response: ${body}`);
+  debug(`received status code ${res.status} from ${res.url} with non-JSON response: ${redactResponseBody(body)}`);
   return Promise.reject(body);
 }
 
@@ -469,12 +482,12 @@ export async function handleAPIv2Res<R extends ResponseBody = ResponseBody, T ex
     // to prevent a memory leak, we should still consume the response body? even though we don't use it?
     // https://x.com/cramforce/status/1762142087930433999
     const body = await res.text();
-    this.debug(`received status code ${res.status} from ${res.url} with no content: ${body}`);
+    this.debug(`received status code ${res.status} from ${res.url} with no content: ${redactResponseBody(body)}`);
     return {} as R;
   } else if (extension === 'json') {
     // Just to be safe, we parse the response as text first in case the response is not valid JSON.
     const text = await res.text();
-    this.debug(`received status code ${res.status} from ${res.url} with JSON response: ${text}`);
+    this.debug(`received status code ${res.status} from ${res.url} with JSON response: ${redactResponseBody(text)}`);
     try {
       const body = JSON.parse(text) as R;
       if (!res.ok) {
@@ -496,7 +509,7 @@ export async function handleAPIv2Res<R extends ResponseBody = ResponseBody, T ex
   // If we receive a non-JSON response, it's likely an error.
   // Let's debug the raw response body and throw it.
   const body = await res.text();
-  this.debug(`received status code ${res.status} from ${res.url} with non-JSON response: ${body}`);
+  this.debug(`received status code ${res.status} from ${res.url} with non-JSON response: ${redactResponseBody(body)}`);
   throw new Error(
     'The ReadMe API responded with an unexpected error. Please try again and if this issue persists, get in touch with us at support@readme.io.',
   );

@@ -1,0 +1,17 @@
+{
+  "$comment": "Managed automatically when syncing with upstream. Do not edit by hand.",
+  "schema_version": 1,
+  "onboarding_type": "copied",
+  "action_type": "node",
+  "upstream": {
+    "repository": "readmeio/rdme",
+    "synced_tag": "v10.10.1",
+    "synced_commit": "ddeeeaf11f42cfab0d49100b503ab4489817acd6",
+    "archived": false
+  },
+  "build": {
+    "package_manager": "npm@11.12.1",
+    "node_version": "24",
+    "script": "build:gha"
+  }
+}
