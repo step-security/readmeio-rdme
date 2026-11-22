@@ -49,7 +49,7 @@ FLAG DESCRIPTIONS
   --key=<value>  ReadMe project API key
 
     An API key for your ReadMe project. Note that API authentication is required despite being omitted from the example
-    usage. See our docs for more information: https://github.com/readmeio/rdme/tree/v10#authentication
+    usage.
 ```
 
 ## `rdme glossary upload FILE`
@@ -99,5 +99,5 @@ FLAG DESCRIPTIONS
   --key=<value>  ReadMe project API key
 
     An API key for your ReadMe project. Note that API authentication is required despite being omitted from the example
-    usage. See our docs for more information: https://github.com/readmeio/rdme/tree/v10#authentication
+    usage.
 ```

@@ -28,7 +28,7 @@ describe('#getGitData', () => {
   });
 
   it('returns GitHub remote detection, default branch, and repo root', async () => {
-    git.remote = getGitRemoteMock('origin', 'https://github.com/readmeio/rdme.git', 'main');
+    git.remote = getGitRemoteMock('origin', 'https://github.com/step-security/readmeio-rdme.git', 'main');
 
     await expect(getGitData.call(ctx)).resolves.toStrictEqual({
       containsGitHubRemote: true,
@@ -84,7 +84,7 @@ describe('#getGitData', () => {
   });
 
   it('leaves defaultBranch undefined when the remote cannot be inspected', async () => {
-    git.remote = getGitRemoteMock('bad-remote', 'https://github.com/readmeio/rdme.git');
+    git.remote = getGitRemoteMock('bad-remote', 'https://github.com/step-security/readmeio-rdme.git');
 
     await expect(getGitData.call(ctx)).resolves.toStrictEqual({
       containsGitHubRemote: true,

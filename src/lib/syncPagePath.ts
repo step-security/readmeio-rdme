@@ -262,11 +262,6 @@ function parentSlugInBatch(
  * broken by natural order of the page `slug` (numeric substrings compare as numbers, e.g.
  * `page-4` before `page-10`).
  *
-<<<<<<< 0d69c20820bf4b5259dca4da204dffe830074401
-=======
- * @see {@link https://github.com/readmeio/rdme/pull/973}
- * @see {@link https://github.com/readmeio/rdme/issues/1552}
->>>>>>> 70c9c58706bb570810cf5d549e6eb8fa0ce4ba4f
  * @returns An array of sorted PageMetadata objects
  */
 function sortFiles(
