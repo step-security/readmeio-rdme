@@ -1,0 +1,7 @@
+[[IgnoredVulns]]
+id = "GHSA-3g3m-2fjr-6pw4"
+reason = "glob@13.x is a transitive dependency of npm@11.x inside @oclif/plugin-plugins. The npm plugin-installation code is not invoked during GitHub Action execution and the vulnerable glob code is only used for npm's internal file operations, not reachable from the action's command input. No upstream fix available as npm@11.x (latest) still depends on glob@^13.x."
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+reason = "minimatch@10.2.x is flagged via package-lock.json but does not affect the GitHub Action: (1) minimatch@10.2.5 from npm@11.x inside @oclif/plugin-plugins is only used for npm's internal file operations, not reachable during action execution; (2) minimatch@10.2.6 from @oclif/core@4.x is not present in the current dist-gha bundle. Fix requires upgrading to @oclif/core@5.x, blocked pending upstream (readmeio/rdme) adoption."

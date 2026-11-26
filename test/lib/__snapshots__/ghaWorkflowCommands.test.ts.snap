@@ -14,7 +14,7 @@ exports[`GitHub Actions workflow commands > BaseCommand#log > does not let repo-
 
 exports[`GitHub Actions workflow commands > docs export > does not emit a workflow command from a page slug 1`] = `
 "::add-mask::rdme_123
-::debug::rdme: init version: @oclif/core@4.13.3 argv: [%0A  'test/__fixtures__/gha-export-out',%0A  '--key',%0A  '[REDACTED]',%0A  [length]: 3%0A]
+::debug::rdme: init version: @oclif/core@4.14.0 argv: [%0A  'test/__fixtures__/gha-export-out',%0A  '--key',%0A  '[REDACTED]',%0A  [length]: 3%0A]
 ::add-mask::rdme_123
 ::add-mask::rdme_123
 ::debug::rdme: parsed flags: [Object: null prototype] {%0A  key: '[REDACTED]',%0A  branch: 'stable',%0A  'docs-only': false%0A}
@@ -42,7 +42,7 @@ exports[`GitHub Actions workflow commands > docs export > does not emit a workfl
 
 exports[`GitHub Actions workflow commands > docs upload > does not emit a workflow command from a frontmatter slug 1`] = `
 "::add-mask::rdme_123
-::debug::rdme: init version: @oclif/core@4.13.3 argv: [%0A  'test/__fixtures__/docs/gha-inject/page.md',%0A  '--key',%0A  '[REDACTED]',%0A  '--dry-run',%0A  [length]: 4%0A]
+::debug::rdme: init version: @oclif/core@4.14.0 argv: [%0A  'test/__fixtures__/docs/gha-inject/page.md',%0A  '--key',%0A  '[REDACTED]',%0A  '--dry-run',%0A  [length]: 4%0A]
 ::add-mask::rdme_123
 ::add-mask::rdme_123
 ::debug::rdme: parsed flags: [Object: null prototype] {%0A  key: '[REDACTED]',%0A  branch: 'stable',%0A  'dry-run': true,%0A  'max-errors': 0%0A}
@@ -66,7 +66,7 @@ exports[`GitHub Actions workflow commands > docs upload > does not emit a workfl
 
 exports[`GitHub Actions workflow commands > docs upload > does not emit a workflow command from an API error title 1`] = `
 "::add-mask::rdme_123
-::debug::rdme: init version: @oclif/core@4.13.3 argv: [%0A  'test/__fixtures__/docs/new-docs/new-doc.md',%0A  '--key',%0A  '[REDACTED]',%0A  '--dry-run',%0A  '--max-errors=-1',%0A  [length]: 5%0A]
+::debug::rdme: init version: @oclif/core@4.14.0 argv: [%0A  'test/__fixtures__/docs/new-docs/new-doc.md',%0A  '--key',%0A  '[REDACTED]',%0A  '--dry-run',%0A  '--max-errors=-1',%0A  [length]: 5%0A]
 ::add-mask::rdme_123
 ::add-mask::rdme_123
 ::debug::rdme: parsed flags: [Object: null prototype] {%0A  key: '[REDACTED]',%0A  branch: 'stable',%0A  'dry-run': true,%0A  'max-errors': -1%0A}
@@ -94,7 +94,7 @@ exports[`GitHub Actions workflow commands > docs upload > does not emit a workfl
 
 exports[`GitHub Actions workflow commands > openapi upload > does not emit a workflow command from info.version 1`] = `
 "::add-mask::rdme_123
-::debug::rdme: init version: @oclif/core@4.13.3 argv: [%0A  'test/__fixtures__/gha-inject-petstore.json',%0A  '--key',%0A  '[REDACTED]',%0A  '--branch',%0A  'stable',%0A  '--slug',%0A  'petstore.json',%0A  '--dry-run',%0A  [length]: 8%0A]
+::debug::rdme: init version: @oclif/core@4.14.0 argv: [%0A  'test/__fixtures__/gha-inject-petstore.json',%0A  '--key',%0A  '[REDACTED]',%0A  '--branch',%0A  'stable',%0A  '--slug',%0A  'petstore.json',%0A  '--dry-run',%0A  [length]: 8%0A]
 ::add-mask::rdme_123
 ::add-mask::rdme_123
 ::debug::rdme: parsed flags: [Object: null prototype] {%0A  key: '[REDACTED]',%0A  branch: 'stable',%0A  'dry-run': true,%0A  slug: 'petstore.json',%0A  timeout: 720%0A}

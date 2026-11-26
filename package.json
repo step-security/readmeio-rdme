@@ -1,7 +1,7 @@
 {
   "name": "@step-security/readmeio-rdme",
-  "private": true,
   "version": "10.10.1",
+  "private": true,
   "description": "ReadMe's official CLI and GitHub Action.",
   "keywords": [
     "api",
@@ -20,16 +20,17 @@
     "readme",
     "swagger"
   ],
+  "homepage": "https://github.com/step-security/readmeio-rdme#readme",
   "bugs": {
     "url": "https://github.com/step-security/readmeio-rdme/issues"
   },
   "license": "MIT",
   "author": "step-security",
-  "publisher": "step-security",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/step-security/readmeio-rdme.git"
   },
+  "publisher": "step-security",
   "bin": {
     "rdme": "bin/run.js"
   },
@@ -169,6 +170,5 @@
   "engines": {
     "node": ">=24",
     "npm": ">=11"
-  },
-  "homepage": "https://github.com/step-security/readmeio-rdme#readme"
+  }
 }
