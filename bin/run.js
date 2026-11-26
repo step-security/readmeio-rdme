@@ -7,6 +7,7 @@ import axios, { isAxiosError } from 'axios';
 import stringArgv from 'string-argv';
 
 import { normalizeStringArgvForGha } from '../dist/lib/normalizeStringArgvForGha.js';
+import { writeCommandResult } from '../dist/lib/workflowCommands.js';
 
 async function validateSubscription() {
   let repoPrivate;
@@ -67,8 +68,7 @@ async function main() {
   }
   await execute(opts).then(msg => {
     if (msg && typeof msg === 'string') {
-      // oxlint-disable-next-line no-console -- This is in an executable.
-      console.log(msg);
+      writeCommandResult(msg);
     }
   });
 }

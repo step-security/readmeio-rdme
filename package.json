@@ -1,6 +1,7 @@
 {
-  "name": "readmeio-rdme",
-  "version": "10.9.6",
+  "name": "@step-security/readmeio-rdme",
+  "private": true,
+  "version": "10.10.1",
   "description": "ReadMe's official CLI and GitHub Action.",
   "keywords": [
     "api",
@@ -24,6 +25,7 @@
   },
   "license": "MIT",
   "author": "step-security",
+  "publisher": "step-security",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/step-security/readmeio-rdme.git"
@@ -68,7 +70,7 @@
     "@oclif/plugin-warn-if-update-available": "^3.1.68",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
-    "axios": "^1.18.1",
+    "axios": "^1.20.0",
     "chalk": "^5.3.0",
     "ci-info": "^4.4.0",
     "configstore": "^7.0.0",
@@ -78,13 +80,13 @@
     "js-yaml": "^5.2.0",
     "json-schema-to-ts": "^3.1.1",
     "mime-types": "^3.0.1",
-    "oas": "^38.2.0",
-    "oas-normalize": "^17.0.0",
+    "oas": "^38.3.1",
+    "oas-normalize": "^18.0.0",
     "ora": "^9.4.1",
     "prompts": "^2.4.2",
     "remove-undefined-objects": "^9.0.0",
     "semver": "^7.8.5",
-    "simple-git": "^3.36.0",
+    "simple-git": "^4.0.2",
     "slugify": "^1.6.9",
     "string-argv": "^0.3.2",
     "table": "^6.8.1",
@@ -108,19 +110,18 @@
     "@types/semver": "^7.3.12",
     "@types/toposort": "^2.0.7",
     "@types/unzipper": "^0.10.11",
-    "@vitest/coverage-v8": "^4.1.9",
-    "@vitest/expect": "^4.1.9",
-    "knip": "^6.23.0",
+    "@vitest/coverage-v8": "^5.0.5",
+    "knip": "^6.42.0",
     "nock": "^14.0.16",
     "oclif": "^4.23.24",
     "openapi-types": "^12.1.3",
-    "oxfmt": "^0.61.0",
+    "oxfmt": "^0.72.0",
     "oxlint": "^1.72.0",
     "rollup": "^4.62.2",
     "rollup-plugin-esbuild": "^6.2.0",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
   },
   "oclif": {
     "bin": "rdme",
@@ -154,6 +155,9 @@
       "docs": {
         "description": "Upload or export Guides in your ReadMe project."
       },
+      "glossary": {
+        "description": "Upload or export glossary terms in your ReadMe project."
+      },
       "openapi": {
         "description": "Manage your API definition (e.g., syncing, validation, analysis, conversion, etc.). Supports OpenAPI, Swagger, and Postman collections, in either JSON or YAML formats."
       },
@@ -163,6 +167,8 @@
     }
   },
   "engines": {
-    "node": ">=24"
-  }
+    "node": ">=24",
+    "npm": ">=11"
+  },
+  "homepage": "https://github.com/step-security/readmeio-rdme#readme"
 }

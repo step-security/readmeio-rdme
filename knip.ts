@@ -4,7 +4,6 @@ const config: KnipConfig = {
   entry: ['bin/dev.js', 'src/lib/help.ts'],
   ignore: ['dist-gha/**', 'bin/set-version-output.js'],
   ignoreDependencies: [
-    'eslint-plugin-readme', // This is used in our Oxlint config through another dependency.
     'tsx', // used in `bin/dev.js`
   ],
   oxfmt: {
