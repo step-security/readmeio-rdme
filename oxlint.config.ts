@@ -34,6 +34,8 @@ export default defineConfig({
       },
     ],
 
+    'no-control-regex': 'off',
+
     'oxc/no-this-in-exported-function': 'off',
 
     // We don't need to wrap `JSON.parse()` in a try/catch block because if JSON parsing anything
